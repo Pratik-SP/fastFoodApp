@@ -6,6 +6,7 @@ import {
   Modal,
   PanResponder,
   ScrollView,
+  StyleSheet,
   Text,
   TouchableOpacity,
   View,
@@ -210,6 +211,28 @@ const AdvancedFilters: React.FC<AdvancedFilterProps> = ({
     </TouchableOpacity>
   );
 
+  const styles = StyleSheet.create({
+    overlayContainer: {
+      opacity: overlayAnim,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      flex: 1,
+    },
+    filterContainer: {
+      transform: [{ translateX: slideAnim }],
+      position: 'absolute',
+      right: 0,
+      top: 0,
+      bottom: 0,
+      width: DRAWER_WIDTH,
+      backgroundColor: 'white',
+      elevation: 10,
+      shadowColor: '#000',
+      shadowOffset: { width: -2, height: 0 },
+      shadowOpacity: 0.25,
+      shadowRadius: 10,
+    },
+  });
+
   return (
     <Modal
       visible={renderModal}
@@ -218,13 +241,7 @@ const AdvancedFilters: React.FC<AdvancedFilterProps> = ({
       onRequestClose={onClose}
     >
       <View className="flex-1">
-        <Animated.View
-          style={{
-            opacity: overlayAnim,
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            flex: 1,
-          }}
-        >
+        <Animated.View style={styles.overlayContainer}>
           <TouchableOpacity
             className="flex-1"
             activeOpacity={1}
@@ -233,20 +250,7 @@ const AdvancedFilters: React.FC<AdvancedFilterProps> = ({
         </Animated.View>
 
         <Animated.View
-          style={{
-            transform: [{ translateX: slideAnim }],
-            position: 'absolute',
-            right: 0,
-            top: 0,
-            bottom: 0,
-            width: DRAWER_WIDTH,
-            backgroundColor: 'white',
-            elevation: 10,
-            shadowColor: '#000',
-            shadowOffset: { width: -2, height: 0 },
-            shadowOpacity: 0.25,
-            shadowRadius: 10,
-          }}
+          style={styles.filterContainer}
           {...panResponder.panHandlers}
         >
           <View className="flex-row flex-between p-6 border-b border-gray-100">
