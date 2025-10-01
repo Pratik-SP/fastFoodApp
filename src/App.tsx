@@ -24,7 +24,7 @@ import Toast from 'react-native-toast-message';
 import RootNavigator from './app/RootNavigator';
 import useAuthStore from './store/auth.store';
 import { useEffect } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, StatusBar, View } from 'react-native';
 import { toastConfig } from './components/toastConfig';
 
 function App() {
@@ -44,8 +44,10 @@ function App() {
   }
   return (
     <NavigationContainer>
-      <RootNavigator />
-      <Toast config={toastConfig} />
+      <View className="flex-1" style={{ paddingTop: StatusBar.currentHeight }}>
+        <RootNavigator />
+        <Toast config={toastConfig} />
+      </View>
     </NavigationContainer>
   );
 }
