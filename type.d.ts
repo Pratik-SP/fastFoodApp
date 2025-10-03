@@ -42,12 +42,16 @@ export interface CartCustomization {
 
 export interface CartItemType {
   id: string; // menu item id
-  cartItemId: string; // unique id for cart item (menu item id + customizations)
+  cartItemId?: string; // unique id for cart item (menu item id + customizations)
   name: string;
   price: number;
   image_url: string;
   quantity?: number;
   customizations?: CartCustomization[];
+}
+
+export interface CartState {
+  items: CartItemType[];
 }
 
 export interface CartStore {
@@ -139,4 +143,3 @@ export type RootStackParamList = {
   Auth: undefined;
   Main: undefined;
 };
-

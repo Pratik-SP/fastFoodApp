@@ -34,7 +34,10 @@ function Index() {
       <View className="flex-between flex-row w-full mt-5 mb-3 px-6">
         <View className="flex-start">
           <Text className="small-bold text-primary">DELIVER TO</Text>
-          <TouchableOpacity className="flex-center flex-row gap-x-1 mt-0.5">
+          <TouchableOpacity
+            activeOpacity={0.7}
+            className="flex-center flex-row gap-x-1 mt-0.5"
+          >
             <Text className="paragraph-bold text-dark-100">Gujarat</Text>
             <Image
               source={images.arrowDown}
@@ -79,9 +82,10 @@ function Index() {
                   <Text className="h1-bold text-white leading-tight">
                     {item.title}
                   </Text>
+                  {/* <Text className='h3-bold text-white m-0'>$10.00</Text> */}
                   <Image
                     source={images.arrowRight}
-                    className="size-10"
+                    className="size-16"
                     resizeMode="contain"
                     tintColor="#ffffff"
                   />

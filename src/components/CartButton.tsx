@@ -3,16 +3,17 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { images } from '../constants';
-import { useCartStore } from '../store/cart.store';
+// import { useCartStore } from '../store/cart.store';
 import { TabScreenParamList } from '../../type';
+import { useAppSelector } from '../redux-store/hooks';
+import { selectTotalItems } from '../redux-store/cartSlice';
 
 type TabNavProp = NativeStackNavigationProp<TabScreenParamList>;
 
 function CartButton() {
   const navigation = useNavigation<TabNavProp>();
-  const { getTotalItems } = useCartStore();
-  const totalItems = getTotalItems();
-
+  
+  const totalItems = useAppSelector(selectTotalItems);
   return (
     <TouchableOpacity
       className="cart-btn"

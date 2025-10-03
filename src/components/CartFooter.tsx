@@ -1,8 +1,10 @@
 import { Text, View } from 'react-native';
 import cn from 'clsx';
-import { useCartStore } from '../store/cart.store';
+
 import { PaymentInfoStripeProps } from '../../type';
 import CustomButton from './CustomButton';
+import { useAppSelector } from '../redux-store/hooks';
+import { selectTotalItems, selectTotalPrice } from '../redux-store/cartSlice';
 
 const PaymentInfoStripe = ({
   label,
@@ -21,10 +23,9 @@ const PaymentInfoStripe = ({
 );
 
 const CartFooter = () => {
-  const { getTotalPrice, getTotalItems } = useCartStore();
-
-  const totalItems = getTotalItems();
-  const totalPrice = getTotalPrice();
+  const totalItems = useAppSelector(selectTotalItems);
+  const totalPrice = useAppSelector(selectTotalPrice);
+  
   return (
     totalItems > 0 && (
       <View className="gap-5">

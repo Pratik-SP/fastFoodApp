@@ -1,11 +1,12 @@
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 
-import { useCartStore } from '../store/cart.store';
 import { CartCustomization, CartItemType } from '../../type';
+import { useAppDispatch } from '../redux-store/hooks';
+import { decreaseQty, increaseQty, removeItem } from '../redux-store/cartSlice';
 
 const CartItem = ({ item }: { item: CartItemType }) => {
-  const { increaseQty, decreaseQty, removeItem } = useCartStore();
+  const dispatch = useAppDispatch();
 
   const getItemTotalPrice = (cartItem: CartItemType) => {
     const base = cartItem.price;
@@ -46,8 +47,16 @@ const CartItem = ({ item }: { item: CartItemType }) => {
 
           <View className="flex flex-row items-center gap-x-4 mt-2">
             <TouchableOpacity
-              onPress={() => decreaseQty(item.id, item.customizations!)}
+              onPress={() =>
+                dispatch(
+                  decreaseQty({
+                    id: item.id,
+                    customizations: item.customizations!,
+                  }),
+                )
+              }
               className="cart-item__actions"
+              activeOpacity={0.7}
             >
               <Feather name="minus" size={14} color={'#FF9C01'} />
             </TouchableOpacity>
@@ -55,8 +64,16 @@ const CartItem = ({ item }: { item: CartItemType }) => {
             <Text className="base-bold text-dark-100">{item.quantity}</Text>
 
             <TouchableOpacity
-              onPress={() => increaseQty(item.id, item.customizations!)}
+              onPress={() =>
+                dispatch(
+                  increaseQty({
+                    id: item.id,
+                    customizations: item.customizations!,
+                  }),
+                )
+              }
               className="cart-item__actions"
+              activeOpacity={0.7}
             >
               <Feather name="plus" size={14} color={'#FF9C01'} />
             </TouchableOpacity>
@@ -65,7 +82,12 @@ const CartItem = ({ item }: { item: CartItemType }) => {
       </View>
 
       <TouchableOpacity
-        onPress={() => removeItem(item.id, item.customizations!)}
+        onPress={() =>
+          dispatch(
+            removeItem({ id: item.id, customizations: item.customizations! }),
+          )
+        }
+        activeOpacity={0.7}
         className="flex-center"
       >
         <Feather name="trash-2" size={20} color="#F14141" />

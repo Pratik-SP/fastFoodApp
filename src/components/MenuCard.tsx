@@ -9,12 +9,13 @@ import {
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 import Fontisto from 'react-native-vector-icons/Fontisto';
+import Toast from 'react-native-toast-message';
+import Entypo from 'react-native-vector-icons/Entypo';
 
 import { MainStackParamList, MenuItem } from '../../type';
 import { appwriteConfig } from '../app/lib/appwriteConfig';
-import { useCartStore } from '../store/cart.store';
-import Toast from 'react-native-toast-message';
-import Entypo from 'react-native-vector-icons/Entypo';
+import { useAppDispatch } from '../redux-store/hooks';
+import { addItem } from '../redux-store/cartSlice';
 
 type NavigationProp = NativeStackNavigationProp<
   MainStackParamList,
@@ -27,14 +28,15 @@ function MenuCard({
   item: MenuItem;
 }>) {
   const navigation = useNavigation<NavigationProp>();
-
   const imageUrl = `${item.image_url}?project=${appwriteConfig.projectId}`;
-  const { addItem } = useCartStore();
+  const dispatch = useAppDispatch();
+
   return (
     <TouchableOpacity
       className="menu-card"
       onPress={() => navigation.navigate('ItemDetails', { item })}
       style={Platform.OS === 'android' ? styles.androidStyle : {}}
+      activeOpacity={0.8}
     >
       <Image
         source={{ uri: imageUrl }}
@@ -56,14 +58,17 @@ function MenuCard({
         <Text className="paragraph-bold">{item.rating}</Text>
       </View>
       <TouchableOpacity
+        activeOpacity={0.7}
         onPress={() => {
-          addItem({
-            id: item.$id,
-            name: item.name,
-            price: item.price,
-            image_url: imageUrl,
-            customizations: [],
-          });
+          dispatch(
+            addItem({
+              id: item.$id,
+              name: item.name,
+              price: item.price,
+              image_url: imageUrl,
+              customizations: [],
+            }),
+          );
           Toast.show({
             type: 'success',
             text1: 'Added to cart',

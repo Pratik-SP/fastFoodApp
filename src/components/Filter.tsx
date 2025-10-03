@@ -56,6 +56,7 @@ function Filter({ categories, selectedCategory = '' }: Readonly<FilterProps>) {
           )}
           style={Platform.OS === 'android' ? styles.androidStyle : {}}
           onPress={() => handlelPress(item.$id)}
+          activeOpacity={0.7}
         >
           <Text
             className={cn(

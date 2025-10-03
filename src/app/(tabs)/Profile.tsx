@@ -1,10 +1,11 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-import { signOut } from '../lib/appwrite';
-import useAuthStore from '../../store/auth.store';
 import { images } from '../../constants';
 import CustomButton from '../../components/CustomButton';
+import { useAppDispatch, useAppSelector } from '../../redux-store/hooks';
+import { logOut } from '../../redux-store/authSlice';
+import { signOut } from '../lib/appwrite';
 
 function ProfileDetails({ title, userDetail }: any) {
   return (
@@ -25,13 +26,13 @@ function ProfileDetails({ title, userDetail }: any) {
 }
 
 function Profile() {
-  const { setIsAuthenticated, setUser, user } = useAuthStore();
+  const { user } = useAppSelector(state => state.auth);
+  const dispatch = useAppDispatch();
+
   const handleLogout = async () => {
     try {
+      dispatch(logOut());
       await signOut();
-
-      setIsAuthenticated(false);
-      setUser(null);
     } catch (error) {
       console.error('Logout error', error);
     }
@@ -46,7 +47,7 @@ function Profile() {
         </View>
         <View className="py-8 flex-center">
           <Image source={{ uri: user?.avatar }} className="profile-avatar" />
-          <TouchableOpacity className="ml-20">
+          <TouchableOpacity activeOpacity={0.7} className="ml-20">
             <Image
               source={images.pencil}
               resizeMode="center"

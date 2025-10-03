@@ -2,11 +2,11 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import AuthNavigator from './(auth)/AuthNavigator';
 import TabsStackNavigator from './(tabs)/TabsStackNavigator';
-import useAuthStore from '../store/auth.store';
+import { useAppSelector } from '../redux-store/hooks';
 
 const Stack = createNativeStackNavigator();
 function RootNavigator() {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated } = useAppSelector(state => state.auth);
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>

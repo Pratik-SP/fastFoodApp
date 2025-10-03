@@ -20,8 +20,9 @@ import { getCustomizations } from '../lib/appwrite';
 import { images } from '../../constants';
 import { MainStackParamList, Customizations } from '../../../type';
 import useAppwrite from '../lib/useAppwrite';
-import { useCartStore } from '../../store/cart.store';
 import Toast from 'react-native-toast-message';
+import { useAppDispatch } from '../../redux-store/hooks';
+import { addItem } from '../../redux-store/cartSlice';
 
 type ItemDetailsRouteProp = RouteProp<MainStackParamList, 'ItemDetails'>;
 
@@ -29,7 +30,9 @@ function MenuItemDetails() {
   const route = useRoute<ItemDetailsRouteProp>();
   const { item } = route.params;
 
-  const { addItem } = useCartStore();
+  const dispatch = useAppDispatch();
+  // const addItem = useAppSelector(state => state.cart.addItem);
+  // const { addItem } = useCartStore();
 
   const { data: customizations } = useAppwrite({ fn: getCustomizations });
 
@@ -302,28 +305,31 @@ function MenuItemDetails() {
           <TouchableOpacity
             className="custom-btn ml-6 flex-1"
             onPress={() => {
-              addItem({
-                id: item.$id,
-                name: item.name,
-                price: item.price,
-                image_url: imageUrl,
-                quantity,
-                customizations: selectedCustomizations
-                  .map(id => {
-                    const c = customizations?.find(cust => cust.$id === id);
-                    if (!c) return null;
-                    return c
-                      ? {
-                          id: c.$id,
-                          name: c.name,
-                          price: c.price / 100,
-                          isDefault:
-                            defaultCustomizations.includes(c.$id) || undefined,
-                        }
-                      : null;
-                  })
-                  .filter(Boolean) as any[],
-              });
+              dispatch(
+                addItem({
+                  id: item.$id,
+                  name: item.name,
+                  price: item.price,
+                  image_url: imageUrl,
+                  quantity,
+                  customizations: selectedCustomizations
+                    .map(id => {
+                      const c = customizations?.find(cust => cust.$id === id);
+                      if (!c) return null;
+                      return c
+                        ? {
+                            id: c.$id,
+                            name: c.name,
+                            price: c.price / 100,
+                            isDefault:
+                              defaultCustomizations.includes(c.$id) ||
+                              undefined,
+                          }
+                        : null;
+                    })
+                    .filter(Boolean) as any[],
+                }),
+              );
               Toast.show({
                 type: 'success',
                 text1: 'Added to cart',

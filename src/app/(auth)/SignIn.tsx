@@ -7,14 +7,15 @@ import * as Sentry from '@sentry/react-native';
 import CustomInput from '../../components/CustomInput';
 import CustomButton from '../../components/CustomButton';
 import { AuthStackParamList } from '../../../type';
-import { getCurrentUser, signIn } from '../lib/appwrite';
-import useAuthStore from '../../store/auth.store';
+import { signIn } from '../lib/appwrite';
+import { fetchAuthenticatedUser } from '../../redux-store/authSlice';
+import { useAppDispatch } from '../../redux-store/hooks';
 
 type AuthNavProp = NativeStackNavigationProp<AuthStackParamList>;
 
 function SignIn() {
   const AuthNavigation = useNavigation<AuthNavProp>();
-  const { setIsAuthenticated, setUser } = useAuthStore();
+  const dispatch = useAppDispatch();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [form, setForm] = useState({ email: '', password: '' });
@@ -28,12 +29,7 @@ function SignIn() {
     setIsSubmitting(true);
     try {
       await signIn({ email, password });
-
-      const user = await getCurrentUser();
-      if (user) {
-        setUser(user as any);
-        setIsAuthenticated(true);
-      }
+      dispatch(fetchAuthenticatedUser());
     } catch (error: any) {
       Alert.alert('Error', error.message);
       Sentry.captureEvent(error);

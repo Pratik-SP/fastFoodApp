@@ -54,6 +54,7 @@ function SearchBar() {
       <TouchableOpacity
         className="pr-5"
         onPress={() => navigation.setParams({ query })}
+        activeOpacity={0.7}
       >
         <Fontisto name="search" size={20} color="#A0A0A0" />
       </TouchableOpacity>

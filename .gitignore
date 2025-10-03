@@ -147,7 +147,7 @@ web-build/
 /ios/Pods/
 
 # Environment variables
-.env
+# .env
 .env.local
 .env.production.local
 .env.staging.local

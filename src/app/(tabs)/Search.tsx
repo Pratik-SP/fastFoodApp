@@ -352,6 +352,7 @@ function Search() {
           <TouchableOpacity
             className="w-12 h-12 bg-primary/10 rounded-lg flex-center relative"
             onPress={() => setIsDrawerVisible(true)}
+            activeOpacity={0.6}
           >
             <Icon name="tune" size={24} color="#FF6B35" />
 

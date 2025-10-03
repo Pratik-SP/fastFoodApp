@@ -5,11 +5,11 @@ import Feather from 'react-native-vector-icons/Feather';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { TabBarIconProps } from '../../type';
-import { useCartStore } from '../store/cart.store';
+import { selectTotalItems } from '../redux-store/cartSlice';
+import { useAppSelector } from '../redux-store/hooks';
 
 const TabBarIcon = ({ focused, title }: TabBarIconProps) => {
-  const { getTotalItems } = useCartStore();
-  const totalItems = getTotalItems();
+  const totalItems = useAppSelector(selectTotalItems);
 
   return (
     <View className="tab-icon items-center">

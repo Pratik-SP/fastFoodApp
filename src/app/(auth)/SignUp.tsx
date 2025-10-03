@@ -3,18 +3,19 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useState } from 'react';
 
-import { createUser, getCurrentUser } from '../lib/appwrite';
-import useAuthStore from '../../store/auth.store';
+import { createUser } from '../lib/appwrite';
 import CustomInput from '../../components/CustomInput';
 import CustomButton from '../../components/CustomButton';
 import { AuthStackParamList } from '../../../type';
+import { useAppDispatch } from '../../redux-store/hooks';
+import { fetchAuthenticatedUser } from '../../redux-store/authSlice';
 
 type AuthNavProp = NativeStackNavigationProp<AuthStackParamList>;
 
 function SignUp() {
   const AuthNavigation = useNavigation<AuthNavProp>();
-  const { setIsAuthenticated, setUser } = useAuthStore();
-
+  const dispatch = useAppDispatch();
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', password: '' });
 
@@ -26,12 +27,7 @@ function SignUp() {
     setIsSubmitting(true);
     try {
       await createUser({ name, email, password });
-
-      const user = await getCurrentUser();
-      if (user) {
-        setUser(user as any);
-        setIsAuthenticated(true);
-      }
+      dispatch(fetchAuthenticatedUser());
     } catch (error: any) {
       Alert.alert('Error', error.message);
     } finally {

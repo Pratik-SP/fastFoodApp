@@ -1,10 +1,10 @@
 import { FlatList, Text, View } from 'react-native';
-import { useCartStore } from '../../store/cart.store';
 import CartItem from '../../components/CartItem';
 import CartFooter from '../../components/CartFooter';
+import { useAppSelector } from '../../redux-store/hooks';
 
 function Cart() {
-  const { items } = useCartStore();
+  const { items } = useAppSelector(state => state.cart);
 
   return (
     <View className="bg-white h-full">
