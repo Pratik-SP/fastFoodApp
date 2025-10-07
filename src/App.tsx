@@ -52,7 +52,7 @@ function App() {
   const styles = StyleSheet.create({
     spaces: {
       paddingTop: StatusBar.currentHeight,
-      paddingBottom: 25,
+      paddingBottom: 24,
     },
   });
   return (

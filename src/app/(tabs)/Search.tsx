@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { useEffect, useState } from 'react';
 import { RouteProp, useRoute } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import cn from 'clsx';
 
 import { getCategories, getMenu } from '../lib/appwrite';
@@ -18,7 +19,6 @@ import Filter from '../../components/Filter';
 import { images } from '../../constants';
 import { Category, MenuItem, TabScreenParamList } from '../../../type';
 import AdvancedFilters from '../../components/AdvancedFilters';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 import FilterChip from '../../components/FilterChip';
 
 type SearchScreenRouteProp = RouteProp<TabScreenParamList, 'Search'>;
@@ -36,6 +36,34 @@ interface FilterState {
     protein: 'under-20' | '20-25' | '25-30' | '30-35' | '35-plus' | null;
   };
 }
+
+const PRICE_RANGE_LABELS: Record<string, string> = {
+  'under-20': 'Under $20',
+  'under-25': 'Under $25',
+  'under-30': 'Under $30',
+  '30-plus': '$30 +',
+};
+
+const RATING_LABELS: Record<string, string> = {
+  '3-plus': '3+ stars',
+  '4-plus': '4+ stars',
+  '4.5-plus': '4.5+ stars',
+};
+
+const CALORIES_LABELS: Record<string, string> = {
+  '400-500': '400-500 cal',
+  '500-600': '500-600 cal',
+  '600-650': '600-650 cal',
+  '700-plus': '700+ cal',
+};
+
+const PROTEIN_LABELS: Record<string, string> = {
+  'under-20': 'Under 20g',
+  '20-25': '20-25g',
+  '25-30': '25-30g',
+  '30-35': '30-35g',
+  '35-plus': 'above 35g',
+};
 
 const renderEmptyState = (menuLoading: boolean) => (
   <View className="flex-1 flex-center">
@@ -218,7 +246,7 @@ function Search() {
     return count;
   };
 
-  const renderctiveFilterChips = () => {
+  const renderActiveFilterChips = () => {
     const chips = [];
 
     if (filters.price.sort !== null) {
@@ -241,16 +269,10 @@ function Search() {
     }
 
     if (filters.price.range !== null) {
-      const priceRanges: Record<string, string> = {
-        'under-20': 'Under $20',
-        'under-25': 'Under $25',
-        'under-30': 'Under $30',
-        '30-plus': '$30+',
-      };
       chips.push(
         <FilterChip
           key="price-range"
-          label={priceRanges[filters.price.range]}
+          label={PRICE_RANGE_LABELS[filters.price.range]}
           onRemove={() =>
             setFilters(prev => ({
               ...prev,
@@ -262,15 +284,10 @@ function Search() {
     }
 
     if (filters.rating.level !== null) {
-      const priceRanges: Record<string, string> = {
-        '3-plus': '3+ stars',
-        '4-plus': '4+ stars',
-        '4.5-plus': '4.5+ stars',
-      };
       chips.push(
         <FilterChip
           key="rating-level"
-          label={priceRanges[filters.rating.level]}
+          label={RATING_LABELS[filters.rating.level]}
           onRemove={() =>
             setFilters(prev => ({
               ...prev,
@@ -282,16 +299,10 @@ function Search() {
     }
 
     if (filters.nutrition.calories !== null) {
-      const priceRanges: Record<string, string> = {
-        '400-500': '400-500 cal',
-        '500-600': '500-600 cal',
-        '600-650': '600-650 cal',
-        '700-plus': '700+ cal',
-      };
       chips.push(
         <FilterChip
           key="nutrition-calories"
-          label={priceRanges[filters.nutrition.calories]}
+          label={CALORIES_LABELS[filters.nutrition.calories]}
           onRemove={() =>
             setFilters(prev => ({
               ...prev,
@@ -303,17 +314,10 @@ function Search() {
     }
 
     if (filters.nutrition.protein !== null) {
-      const priceRanges: Record<string, string> = {
-        'under-20': 'Under 20g',
-        '20-25': '20-25g',
-        '25-30': '25-30g',
-        '30-35': '30-35g',
-        '35-plus': '35g+',
-      };
       chips.push(
         <FilterChip
           key="nutrition-protein"
-          label={priceRanges[filters.nutrition.protein]}
+          label={PROTEIN_LABELS[filters.nutrition.protein]}
           onRemove={() =>
             setFilters(prev => ({
               ...prev,
@@ -329,6 +333,26 @@ function Search() {
         <View className="flex-row flex-wrap">{chips}</View>
       </View>
     ) : null;
+  };
+
+  const renderMenuItem = ({
+    item,
+    index,
+  }: {
+    item: MenuItem;
+    index: number;
+  }) => {
+    const isFirstRightColItem = index % 2 === 0;
+    return (
+      <View
+        className={cn(
+          'flex-1 max-w-[48%]',
+          !isFirstRightColItem ? 'mt-10' : 'mt-0',
+        )}
+      >
+        <MenuCard item={item as unknown as MenuItem} />
+      </View>
+    );
   };
 
   return (
@@ -371,23 +395,11 @@ function Search() {
         )}
       </View>
 
-      {renderctiveFilterChips()}
+      {renderActiveFilterChips()}
 
       <FlatList
         data={filteredMenuItems}
-        renderItem={({ item, index }) => {
-          const isFirstRightColItem = index % 2 === 0;
-          return (
-            <View
-              className={cn(
-                'flex-1 max-w-[48%]',
-                !isFirstRightColItem ? 'mt-10' : 'mt-0',
-              )}
-            >
-              <MenuCard item={item as unknown as MenuItem} />
-            </View>
-          );
-        }}
+        renderItem={renderMenuItem}
         keyExtractor={item => item.$id}
         numColumns={2}
         showsVerticalScrollIndicator={false}

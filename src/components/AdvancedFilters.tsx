@@ -1,4 +1,3 @@
-/* eslint-disable react/no-unstable-nested-components */
 import React, { useEffect, useRef, useState } from 'react';
 import {
   Animated,
@@ -15,7 +14,7 @@ import cn from 'clsx';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const DRAWER_WIDTH = SCREEN_WIDTH * 0.8;
+const DRAWER_WIDTH = SCREEN_WIDTH * 0.85;
 
 export interface FilterState {
   price: {
@@ -39,6 +38,67 @@ interface AdvancedFilterProps {
   filters: FilterState;
   onFilterChange: (filters: FilterState) => void;
 }
+
+interface FilterSectionProps {
+  title: string;
+  icon: string;
+  children: React.ReactNode;
+}
+
+interface FilterOptionProps {
+  title: string;
+  isSelected: boolean;
+  onPress: () => void;
+  subtitle?: string;
+}
+
+const FilterSection: React.FC<FilterSectionProps> = ({
+  title,
+  icon,
+  children,
+}) => (
+  <View className="mb-8">
+    <View className="flex-row items-center mb-4">
+      <Icon name={icon} size={24} color="#FE8C00" />
+      <Text className="h3-bold text-dark-200 ml-2">{title}</Text>
+    </View>
+    {children}
+  </View>
+);
+
+const FilterOption: React.FC<FilterOptionProps> = ({
+  title,
+  isSelected,
+  onPress,
+  subtitle,
+}) => (
+  <TouchableOpacity
+    className={cn(
+      'flex-row flex-between px-4 py-3 mb-2 rounded-xl',
+      isSelected ? 'bg-primary/10 border border-primary' : 'bg-gray-50',
+    )}
+    onPress={onPress}
+  >
+    <View className="flex-1">
+      <Text
+        className={cn(
+          'paragraph-medium',
+          isSelected ? 'text-primary' : 'text-dark-200',
+        )}
+      >
+        {title}
+      </Text>
+      {subtitle && (
+        <Text className="small-bold text-gray-200 mt-1">{subtitle}</Text>
+      )}
+    </View>
+    {isSelected && (
+      <View className="w-5 h-5 rounded-full bg-primary flex-center">
+        <View className="w-2 h-2 rounded-full bg-white" />
+      </View>
+    )}
+  </TouchableOpacity>
+);
 
 const AdvancedFilters: React.FC<AdvancedFilterProps> = ({
   visible,
@@ -135,10 +195,10 @@ const AdvancedFilters: React.FC<AdvancedFilterProps> = ({
     },
   });
 
-  const updateFilter = (
-    category: keyof FilterState,
-    key: string,
-    value: any,
+  const updateFilter = <T extends keyof FilterState>(
+    category: T,
+    key: keyof FilterState[T],
+    value: FilterState[T][keyof FilterState[T]] | null,
   ) => {
     setTempFilters(prev => ({
       ...prev,
@@ -163,53 +223,38 @@ const AdvancedFilters: React.FC<AdvancedFilterProps> = ({
     onClose();
   };
 
-  const FilterSection: React.FC<{
-    title: string;
-    icon: string;
-    children: React.ReactNode;
-  }> = ({ title, icon, children }) => (
-    <View className="mb-8">
-      <View className="flex-row items-center mb-4">
-        <Icon name={icon} size={24} color="#FE8C00" />
-        <Text className="h3-bold text-dark-200 ml-2">{title}</Text>
-      </View>
-      {children}
-    </View>
-  );
+  const PRICE_SORT_OPTIONS = [
+    { key: 'high-to-low', label: 'Price: High to Low' },
+    { key: 'low-to-high', label: 'Price: Low to High' },
+  ] as const;
 
-  const FilterOption: React.FC<{
-    title: string;
-    isSelected: boolean;
-    onPress: () => void;
-    subtitle?: string;
-  }> = ({ title, isSelected, onPress, subtitle }) => (
-    <TouchableOpacity
-      className={cn(
-        'flex-row flex-between px-4 py-3 mb-2 rounded-xl',
-        isSelected ? 'bg-primary/10 border border-primary' : 'bg-gray-50',
-      )}
-      onPress={onPress}
-    >
-      <View className="flex-1">
-        <Text
-          className={cn(
-            'paragraph-medium',
-            isSelected ? 'text-primary' : 'text-dark-200',
-          )}
-        >
-          {title}
-        </Text>
-        {subtitle && (
-          <Text className="small-bold text-gray-200 mt-1">{subtitle}</Text>
-        )}
-      </View>
-      {isSelected && (
-        <View className="w-5 h-5 rounded-full bg-primary flex-center">
-          <View className="w-2 h-2 rounded-full bg-white" />
-        </View>
-      )}
-    </TouchableOpacity>
-  );
+  const PRICE_RANGE_OPTIONS = [
+    { key: 'under-20', label: 'Under $20' },
+    { key: 'under-25', label: 'Under $25' },
+    { key: 'under-30', label: 'Under $30' },
+    { key: '30-plus', label: '$30 +' },
+  ] as const;
+
+  const RATING_OPTIONS = [
+    { key: '3-plus', label: '3+ Stars' },
+    { key: '4-plus', label: '4+ Stars' },
+    { key: '4.5-plus', label: '4.5 + Stars' },
+  ] as const;
+
+  const CALORIES_OPTIONS = [
+    { key: '400-500', label: '400-500 calories' },
+    { key: '500-600', label: '500-600 calories' },
+    { key: '600-650', label: '600-650 calories' },
+    { key: '700-plus', label: '700+ calories' },
+  ] as const;
+
+  const PROTEIN_OPTIONS = [
+    { key: 'under-20', label: 'Under 20g' },
+    { key: '20-25', label: '20-25g' },
+    { key: '25-30', label: '25-30g' },
+    { key: '30-35', label: '30-35g' },
+    { key: '35-plus', label: 'above 35g' },
+  ] as const;
 
   const styles = StyleSheet.create({
     overlayContainer: {
@@ -270,33 +315,22 @@ const AdvancedFilters: React.FC<AdvancedFilterProps> = ({
                 <Text className="paragraph-semibold text-gray-200 mb-3">
                   Sort By
                 </Text>
-                <FilterOption
-                  title="Price: High to Low"
-                  isSelected={tempFilters.price.sort === 'high-to-low'}
-                  onPress={() =>
-                    updateFilter(
-                      'price',
-                      'sort',
-                      tempFilters.price.sort === 'high-to-low'
-                        ? null
-                        : 'high-to-low',
-                    )
-                  }
-                />
-
-                <FilterOption
-                  title="Price: Low to High"
-                  isSelected={tempFilters.price.sort === 'low-to-high'}
-                  onPress={() =>
-                    updateFilter(
-                      'price',
-                      'sort',
-                      tempFilters.price.sort === 'low-to-high'
-                        ? null
-                        : 'low-to-high',
-                    )
-                  }
-                />
+                {PRICE_SORT_OPTIONS.map(option => (
+                  <FilterOption
+                    key={option.key}
+                    title={option.label}
+                    isSelected={tempFilters.price.sort === option.key}
+                    onPress={() =>
+                      updateFilter(
+                        'price',
+                        'sort',
+                        tempFilters.price.sort === option.key
+                          ? null
+                          : option.key,
+                      )
+                    }
+                  />
+                ))}
               </View>
 
               <View>
@@ -304,96 +338,43 @@ const AdvancedFilters: React.FC<AdvancedFilterProps> = ({
                   Price Range
                 </Text>
 
-                <FilterOption
-                  title="Under $20"
-                  isSelected={tempFilters.price.range === 'under-20'}
-                  onPress={() =>
-                    updateFilter(
-                      'price',
-                      'range',
-                      tempFilters.price.range === 'under-20'
-                        ? null
-                        : 'under-20',
-                    )
-                  }
-                />
-                <FilterOption
-                  title="Under $25"
-                  isSelected={tempFilters.price.range === 'under-25'}
-                  onPress={() =>
-                    updateFilter(
-                      'price',
-                      'range',
-                      tempFilters.price.range === 'under-25'
-                        ? null
-                        : 'under-25',
-                    )
-                  }
-                />
-                <FilterOption
-                  title="Under $30"
-                  isSelected={tempFilters.price.range === 'under-30'}
-                  onPress={() =>
-                    updateFilter(
-                      'price',
-                      'range',
-                      tempFilters.price.range === 'under-30'
-                        ? null
-                        : 'under-30',
-                    )
-                  }
-                />
-                <FilterOption
-                  title="$30+"
-                  isSelected={tempFilters.price.range === '30-plus'}
-                  onPress={() =>
-                    updateFilter(
-                      'price',
-                      'range',
-                      tempFilters.price.range === '30-plus' ? null : '30-plus',
-                    )
-                  }
-                />
+                {PRICE_RANGE_OPTIONS.map(option => (
+                  <FilterOption
+                    key={option.key}
+                    title={option.label}
+                    isSelected={tempFilters.price.range === option.key}
+                    onPress={() =>
+                      updateFilter(
+                        'price',
+                        'range',
+                        tempFilters.price.range === option.key
+                          ? null
+                          : option.key,
+                      )
+                    }
+                  />
+                ))}
               </View>
             </FilterSection>
 
             <FilterSection title="Rating" icon="star">
-              <FilterOption
-                title="3+ Stars"
-                isSelected={tempFilters.rating.level === '3-plus'}
-                onPress={() =>
-                  updateFilter(
-                    'rating',
-                    'level',
-                    tempFilters.rating.level === '3-plus' ? null : '3-plus',
-                  )
-                }
-                subtitle="Good and above"
-              />
-              <FilterOption
-                title="4+ Stars"
-                isSelected={tempFilters.rating.level === '4-plus'}
-                onPress={() =>
-                  updateFilter(
-                    'rating',
-                    'level',
-                    tempFilters.rating.level === '4-plus' ? null : '4-plus',
-                  )
-                }
-                subtitle="Very good and above"
-              />
-              <FilterOption
-                title="4.5+ Stars"
-                isSelected={tempFilters.rating.level === '4.5-plus'}
-                onPress={() =>
-                  updateFilter(
-                    'rating',
-                    'level',
-                    tempFilters.rating.level === '4.5-plus' ? null : '4.5-plus',
-                  )
-                }
-                subtitle="Top Rated"
-              />
+              {RATING_OPTIONS.map(option => (
+                <FilterOption
+                  key={option.key}
+                  title={option.label}
+                  isSelected={tempFilters.rating.level === option.key}
+                  onPress={() =>
+                    updateFilter(
+                      'rating',
+                      'level',
+                      tempFilters.rating.level === option.key
+                        ? null
+                        : option.key,
+                    )
+                  }
+                  subtitle="Good and above"
+                />
+              ))}
             </FilterSection>
 
             <FilterSection title="Nutrition" icon="fitness-center">
@@ -402,136 +383,45 @@ const AdvancedFilters: React.FC<AdvancedFilterProps> = ({
                   Calories
                 </Text>
 
-                <FilterOption
-                  title="400 - 500 calories"
-                  isSelected={tempFilters.nutrition.calories === '400-500'}
-                  onPress={() =>
-                    updateFilter(
-                      'nutrition',
-                      'calories',
-                      tempFilters.nutrition.calories === '400-500'
-                        ? null
-                        : '400-500',
-                    )
-                  }
-                />
-
-                <FilterOption
-                  title="500 - 600 calories"
-                  isSelected={tempFilters.nutrition.calories === '500-600'}
-                  onPress={() =>
-                    updateFilter(
-                      'nutrition',
-                      'calories',
-                      tempFilters.nutrition.calories === '500-600'
-                        ? null
-                        : '500-600',
-                    )
-                  }
-                />
-
-                <FilterOption
-                  title="600 - 650 calories"
-                  isSelected={tempFilters.nutrition.calories === '600-650'}
-                  onPress={() =>
-                    updateFilter(
-                      'nutrition',
-                      'calories',
-                      tempFilters.nutrition.calories === '600-650'
-                        ? null
-                        : '600-650',
-                    )
-                  }
-                />
-
-                <FilterOption
-                  title="700+ calories"
-                  isSelected={tempFilters.nutrition.calories === '700-plus'}
-                  onPress={() =>
-                    updateFilter(
-                      'nutrition',
-                      'calories',
-                      tempFilters.nutrition.calories === '700-plus'
-                        ? null
-                        : '700-plus',
-                    )
-                  }
-                />
+                {CALORIES_OPTIONS.map(option => (
+                  <FilterOption
+                    key={option.key}
+                    title={option.label}
+                    isSelected={tempFilters.nutrition.calories === option.key}
+                    onPress={() =>
+                      updateFilter(
+                        'nutrition',
+                        'calories',
+                        tempFilters.nutrition.calories === option.key
+                          ? null
+                          : option.key,
+                      )
+                    }
+                  />
+                ))}
               </View>
+
               <View>
                 <Text className="paragraph-semibold text-gray-200 mb-3">
                   Protein
                 </Text>
 
-                <FilterOption
-                  title="under 20g"
-                  isSelected={tempFilters.nutrition.protein === 'under-20'}
-                  onPress={() =>
-                    updateFilter(
-                      'nutrition',
-                      'protein',
-                      tempFilters.nutrition.protein === 'under-20'
-                        ? null
-                        : 'under-20',
-                    )
-                  }
-                />
-
-                <FilterOption
-                  title="20 - 25g"
-                  isSelected={tempFilters.nutrition.protein === '20-25'}
-                  onPress={() =>
-                    updateFilter(
-                      'nutrition',
-                      'protein',
-                      tempFilters.nutrition.protein === '20-25'
-                        ? null
-                        : '20-25',
-                    )
-                  }
-                />
-
-                <FilterOption
-                  title="25 - 30g"
-                  isSelected={tempFilters.nutrition.protein === '25-30'}
-                  onPress={() =>
-                    updateFilter(
-                      'nutrition',
-                      'protein',
-                      tempFilters.nutrition.protein === '25-30'
-                        ? null
-                        : '25-30',
-                    )
-                  }
-                />
-
-                <FilterOption
-                  title="30 - 35g"
-                  isSelected={tempFilters.nutrition.protein === '30-35'}
-                  onPress={() =>
-                    updateFilter(
-                      'nutrition',
-                      'protein',
-                      tempFilters.nutrition.protein === '30-35'
-                        ? null
-                        : '30-35',
-                    )
-                  }
-                />
-
-                <FilterOption
-                  title="above 35g"
-                  isSelected={tempFilters.nutrition.protein === '35-plus'}
-                  onPress={() =>
-                    updateFilter(
-                      'nutrition',
-                      'protein',
-                      tempFilters.nutrition.protein === '35-plus'
-                        ? null
-                        : '35-plus',
-                    )
-                  }
-                />
+                {PROTEIN_OPTIONS.map(option => (
+                  <FilterOption
+                    key={option.key}
+                    title={option.label}
+                    isSelected={tempFilters.nutrition.protein === option.key}
+                    onPress={() =>
+                      updateFilter(
+                        'nutrition',
+                        'protein',
+                        tempFilters.nutrition.protein === option.key
+                          ? null
+                          : option.key,
+                      )
+                    }
+                  />
+                ))}
               </View>
             </FilterSection>
           </ScrollView>

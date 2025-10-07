@@ -6,12 +6,14 @@ type AuthState = {
   isAuthenticated: boolean;
   user: User | null;
   isLoading: boolean;
+  error: string | null;
 };
 
 const initialState: AuthState = {
   isAuthenticated: false,
   user: null,
   isLoading: true,
+  error: null,
 };
 
 export const fetchAuthenticatedUser = createAsyncThunk<User | null>(
@@ -51,10 +53,17 @@ const authSlice = createSlice({
           state.isLoading = false;
         },
       )
-      .addCase(fetchAuthenticatedUser.rejected, state => {
+      .addCase(fetchAuthenticatedUser.rejected, (state, action) => {
         state.isAuthenticated = false;
         state.user = null;
         state.isLoading = false;
+
+        const errorMessage =
+          typeof action.payload === 'string'
+            ? action.payload
+            : JSON.stringify(action.payload);
+
+        state.error = errorMessage;
       });
   },
 });
